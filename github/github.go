@@ -40,7 +40,6 @@ type User struct {
 func SearchIssues(terms []string) (*IssuesSearchResult, error) {
 	q := url.QueryEscape(strings.Join(terms, " "))
 	resp, err := http.Get(IssuesURL + "?q=" + q)
-	fmt.Println("URL: ", IssuesURL+"?q="+q)
 	if err != nil {
 		return nil, err
 	}
@@ -84,10 +83,10 @@ func PaginateSearchIssues(result *IssuesSearchResult) (*Issue, error) {
 			page = remaining
 		}
 		for _, issue := range result.Items[count : count+page] {
-			fmt.Printf("#%-5d %9.9s %.55s\n", issue.Number, issue.User.Login, issue.Title)
+			fmt.Printf("#%-5d %9.9s %.55s\r\n", issue.Number, issue.User.Login, issue.Title)
 		}
 		if result.TotalCount-count > page {
-			fmt.Printf("%d of %d \n Select an issue or press n to continue", count+page, result.TotalCount)
+			fmt.Printf("%d of %d \r\n Select an issue or press n to continue", count+page, result.TotalCount)
 			input, error := reader.ReadString('\n')
 
 			if error != nil {
