@@ -93,6 +93,7 @@ func PaginateSearchIssues(result *IssuesSearchResult) (*Issue, error) {
 				return nil, error
 			}
 
+			// @TODO Fix this to use terminal buffer now.
 			if input == "n" {
 				continue
 			}

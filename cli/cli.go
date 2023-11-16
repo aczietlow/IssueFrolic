@@ -13,6 +13,7 @@ type cli struct {
 
 func NewTerminal() *cli {
 	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
+	// @TODO Add a kill switch via ctl c
 	terminal := term.NewTerminal(os.Stdin, ">")
 	if err != nil {
 		panic(err)
