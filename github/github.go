@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -19,6 +20,7 @@ const IssuesURL = "https://api.github.com/search/issues"
 type IssuesSearchResult struct {
 	TotalCount int `json:"total_count"`
 	Items      []*Issue
+	ItemsMap   map[int]*Issue
 }
 
 type Issue struct {
@@ -40,6 +42,8 @@ type User struct {
 func SearchIssues(terms []string) (*IssuesSearchResult, error) {
 	q := url.QueryEscape(strings.Join(terms, " "))
 	resp, err := http.Get(IssuesURL + "?q=" + q)
+	defer resp.Body.Close()
+
 	if err != nil {
 		return nil, err
 	}
@@ -60,17 +64,26 @@ func SearchIssues(terms []string) (*IssuesSearchResult, error) {
 	// We must close resp.Body on all execution paths.
 	// (Chapter 5 presents 'defer', which makes this simpler.)
 	if resp.StatusCode != http.StatusOK {
-		resp.Body.Close()
 		return nil, fmt.Errorf("search query failed: %s", resp.Status)
 	}
 
-	var result IssuesSearchResult
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		resp.Body.Close()
-		return nil, err
+	var SearchResult IssuesSearchResult
+
+	// @TODO Add error handling here.
+	githubJsonData, _ := io.ReadAll(resp.Body)
+
+	if err := json.Unmarshal(githubJsonData, &SearchResult); err != nil {
+		fmt.Printf("Error unmarshalling JSON: %v\n", err)
 	}
-	resp.Body.Close()
-	return &result, nil
+
+	issueMap := make(map[int]*Issue)
+	for _, issue := range SearchResult.Items {
+		issueMap[issue.Number] = issue
+	}
+
+	SearchResult.ItemsMap = issueMap
+
+	return &SearchResult, nil
 }
 
 // Paginate through the results.

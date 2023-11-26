@@ -22,5 +22,8 @@ func main() {
 
 	github.PaginateSearchIssues(result)
 
+	test, _ := terminal.Terminal.ReadLine()
+
+	terminal.Terminal.Write([]byte(test + "\r\n"))
 	// @TODO capture a specific issue to work with?
 }

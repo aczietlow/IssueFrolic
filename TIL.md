@@ -1,4 +1,20 @@
-# Searching on Github
+# TIL
+
+## Go Experimental packages
+
+golang.org/x/<foo> are experimental packages, they can introduce breaking changes or go away entirely. 
+
+## Terminal Apps in Go
+
+Place a terminal in raw mode removes any kind of built in text formatting. For example "\n" will get interrupted literally as a new line, despite the expected behavior today being to enter a new line and carriage return to the beginning of hte terminal limits.
+
+"What is a VT100" terminal
+
+Video terminal from the 1970's, popularize b/c it supported ANSI standard code standards. Fun fact this is also where we get the 80 character limitation from as the terminal was 80 column wide and 24 lines in height.
+
+
+
+## Searching on Github
 
 [source](https://docs.github.com/en/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax)
 
