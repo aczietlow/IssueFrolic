@@ -3,6 +3,7 @@
 package github
 
 import (
+	"aczietlow/IssueFrolic/net"
 	"bufio"
 	"encoding/json"
 	"fmt"
@@ -10,7 +11,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -41,12 +41,17 @@ type User struct {
 // SearchIssues queries the GitHub issue tracker.
 func SearchIssues(terms []string) (*IssuesSearchResult, error) {
 	q := url.QueryEscape(strings.Join(terms, " "))
-	resp, err := http.Get(IssuesURL + "?q=" + q)
-	defer resp.Body.Close()
-
+	request, err := http.NewRequest("GET", IssuesURL+"?q="+q, nil)
 	if err != nil {
 		return nil, err
 	}
+
+	resp, err := net.Client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
 	//!-
 	// For long-term stability, instead of http.Get, use the
 	// variant below which adds an HTTP request header indicating
@@ -61,16 +66,17 @@ func SearchIssues(terms []string) (*IssuesSearchResult, error) {
 	//   resp, err := http.DefaultClient.Do(req)
 	//!+
 
-	// We must close resp.Body on all execution paths.
-	// (Chapter 5 presents 'defer', which makes this simpler.)
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("search query failed: %s", resp.Status)
 	}
 
 	var SearchResult IssuesSearchResult
 
-	// @TODO Add error handling here.
-	githubJsonData, _ := io.ReadAll(resp.Body)
+	githubJsonData, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		fmt.Printf("Error with GET Request: %v\n", err)
+	}
 
 	if err := json.Unmarshal(githubJsonData, &SearchResult); err != nil {
 		fmt.Printf("Error unmarshalling JSON: %v\n", err)
@@ -110,15 +116,8 @@ func PaginateSearchIssues(result *IssuesSearchResult) (*Issue, error) {
 			if input == "n" {
 				continue
 			}
-			if isNumber(input) {
 
-			}
 		}
 	}
 	return nil, nil
-}
-
-func isNumber(s string) bool {
-	_, err := strconv.Atoi(s)
-	return err == nil
 }
