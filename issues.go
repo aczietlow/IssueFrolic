@@ -13,15 +13,13 @@ import (
 
 func main() {
 
-	config, err := config.LoadConfig("config.json")
+	conf, err := config.LoadConfig("config.json")
 
 	terminal := cli.NewTerminal()
-	net.NewClient(config.Token)
+	net.NewClient(conf.Token)
 
 	//options := terminal.Args.Options
 	defer terminal.Restore()
-
-	terminal.Terminal.Write([]byte(config.Username + "\r\n"))
 
 	result, err := github.SearchIssues(os.Args[1:])
 	if err != nil {

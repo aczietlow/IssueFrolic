@@ -106,10 +106,10 @@ func PaginateSearchIssues(result *IssuesSearchResult) (*Issue, error) {
 		}
 		if result.TotalCount-count > page {
 			fmt.Printf("%d of %d \r\n Select an issue or press n to continue", count+page, result.TotalCount)
-			input, error := reader.ReadString('\n')
+			input, err := reader.ReadString('\n')
 
-			if error != nil {
-				return nil, error
+			if err != nil {
+				return nil, err
 			}
 
 			// @TODO Fix this to use terminal buffer now.
