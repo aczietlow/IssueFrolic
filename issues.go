@@ -29,16 +29,21 @@ func main() {
 
 	github.PaginateSearchIssues(result)
 
-	input, _ := terminal.Terminal.ReadLine()
+	// This is insane, we need some sort of auto discovery pattern here, we can't write a giant switch case to rule them all.
+	for {
+		input, _ := terminal.Terminal.ReadLine()
+		if isInt, key := IsNumber(input); isInt {
+			issue, exists := result.ItemsMap[key]
+			if exists {
+				terminal.Terminal.Write([]byte(issue.Body + "\r\n"))
+				terminal.Terminal.Write([]byte("Click here for more information:" + issue.HTMLURL + "\r\n"))
+			} else {
+				terminal.Terminal.Write([]byte("Provided issue not in returned list, try again or enter a new search \r\n"))
+			}
+		}
 
-	terminal.Terminal.Write([]byte(input + "\r\n"))
-	// @TODO capture a specific issue to work with?
-
-	if isInt, key := IsNumber(input); isInt {
-		issue, exists := result.ItemsMap[key]
-		if exists {
-			terminal.Terminal.Write([]byte(issue.Body + "\r\n"))
-			terminal.Terminal.Write([]byte("Click here for more information:" + issue.HTMLURL + "\r\n"))
+		if input == `exit` {
+			break
 		}
 	}
 }
